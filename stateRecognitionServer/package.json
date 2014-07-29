@@ -1,0 +1,17 @@
+{
+  "name": "stateRecognitionServer",
+  "version": "0.0.0",
+  "main": "stateRecognitionServer.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DDRAGON/stateRecognitionServer.git"
+  },
+  "author": "DD",
+  "license": "BSD",
+  "devDependencies": {
+    "http": "0.0.0",
+    "request": "~2.33.0",
+    "querystring": "~0.2.0",
+    "url": "~0.7.9"
+  }
+}

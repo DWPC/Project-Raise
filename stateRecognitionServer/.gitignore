@@ -1,0 +1,8 @@
+.DS_Store
+.project
+.settings/
+node_modules/
+.idea/
+SMDSOnline.iml
+pom.xml
+src/

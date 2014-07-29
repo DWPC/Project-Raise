@@ -1,0 +1,230 @@
+<!doctype html>
+ 
+<head>
+	<meta http-eauiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>image send tool</title>
+	<script src="jquery-2.0.2.js"></script>
+	<style type="text/css">
+		button.leftButton  {
+			font-family: "fantasy",sans-serif;
+			font-size: 1.4em;
+			font-weight: bold;
+			padding: 5px 30px;
+			color: #000;
+			border-style: none;
+			box-shadow: 2px 2px 3px 1px #666;
+			-moz-box-shadow: 2px 2px 3px 1px #666;
+			-webkit-box-shadow: 2px 2px 3px 1px #666;
+			text-shadow: 1px 1px 2px #000;
+			background: -moz-linear-gradient(bottom, #aaa, #eee 50%, #aaa);
+			background: -webkit-gradient(linear, left bottom, left top, from(#ccc), color-stop(0.5, #eee), to(#ccc));
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			margin:5px 5px 5px 5px;
+		}
+		button:hover {
+			opacity: 0.5;
+		}
+
+		button.largeButton {
+			font-family: "fantasy",fantasy;
+			font-size: 1.2em;
+			padding: 5px 50px;
+			color: #000;
+			border-style: none;
+			box-shadow: 2px 2px 3px 1px #666;
+			-moz-box-shadow: 2px 2px 3px 1px #666;
+			-webkit-box-shadow: 2px 2px 3px 1px #666;
+			text-shadow: 1px 1px 2px #000;
+			background: -moz-linear-gradient(bottom, #aaa, #eee 50%, #aaa);
+			background: -webkit-gradient(linear, left bottom, left top, from(#ddd), color-stop(0.0, #fff), to(#ddd));
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			margin:5px 5px 5px 5px;
+		}
+	</style>
+</head>
+
+	<body>
+
+<button class="largeButton" onClick="sendImage('start')">start</button>
+<button class="largeButton" onClick="sendImage('preFlop')">pre flop</button>
+<button class="largeButton" onClick="sendImage('nextGame')">next Game</button>
+<DIV id="id_sound" style="position:absolute; visibility:hidden"></DIV>
+
+<br style="clear: left;">
+<button class="leftButton" id="s" onClick="markClick('s')" style="color:#000000">♠</button>
+<button class="leftButton" id="h" onClick="markClick('h')" style="color:#FF0000">♥</button>
+<button class="leftButton" id="d" onClick="markClick('d')" style="color:#0000FF">♦</button>
+<button class="leftButton" id="c" onClick="markClick('c')" style="color:#00bb00">♣</button>
+<br style="clear: left;">
+<button class="leftButton" id="2" onClick="numClick('2')">2</button>
+<button class="leftButton" id="3" onClick="numClick('3')">3</button>
+<button class="leftButton" id="4" onClick="numClick('4')">4</button>
+<button class="leftButton" id="5" onClick="numClick('5')">5</button>
+<br style="clear: left;">
+<button class="leftButton" id="6" onClick="numClick('6')">6</button>
+<button class="leftButton" id="7" onClick="numClick('7')">7</button>
+<button class="leftButton" id="8" onClick="numClick('8')">8</button>
+<button class="leftButton" id="9" onClick="numClick('9')">9</button>
+<br style="clear: left;">
+<button class="leftButton" id="T" onClick="numClick('T')">T</button>
+<button class="leftButton" id="J" onClick="numClick('J')">J</button>
+<button class="leftButton" id="a" onClick="numClick('a')">a</button>
+<button class="leftButton" id="K" onClick="numClick('K')">K</button>
+<button class="leftButton" id="A" onClick="numClick('A')">A</button>
+<br style="clear: left;">
+<div id='image' width='300' style="float:left;"></div><div id='sentImage' width='300' style="float:left;"></div><div style="clear:both;">
+<br>
+<input type='text' onkeyDown="keyDown();" id="inputArea">
+<br>
+<button class="largeButton" onClick="sendCard()">send</button>
+<br>
+<span style="color:#ff0000;font-size:22px;" id="message"></span>
+<br>
+<div id='b'></div>
+
+	</body>
+</html>
+
+
+
+<script>
+	var url = 'http://157.7.200.224:3000/';
+	var url = 'http://localhost:3000/';
+	var easyMode = true;
+	var mark = '';
+	var num  = '　';
+
+
+	function markClick(mark) {
+		this.mark = mark;
+		drawImage();
+	}
+
+	function numClick(num) {
+		this.num = num;
+		drawImage();
+	}
+
+	function sendImage(image) {
+		$.ajax({
+			type: "POST",
+			url: url,
+			data: { 'image': image }
+		}).always(function(data){$('#message').html('send '+image);});
+		this.mark = '';
+		this.num  = '　';
+		drawImage();
+		drawSentImage(image)
+	}
+
+	function sendCard() {
+		if (this.mark != 's' && this.mark != 'h' && this.mark != 'd' && this.mark != 'c') {
+			$('#message').html('mark is invalid!');
+			return;
+		}
+		if (this.num != '2' && this.num != '3' && this.num != '4' && this.num != '5' && this.num != '6' &&
+				this.num != '7' && this.num != '8' && this.num != '9' && this.num != 'T' && this.num != 'J' &&
+				this.num != 'a' && this.num != 'K' && this.num != 'A') {
+			$('#message').html('number is invalid!');
+			return;
+		}
+		sendImage(this.num+this.mark);
+	}
+
+	function drawImage() {
+		switch (this.mark){
+			case 's':
+				$('#image').html('<span style="color:#000000;font-size:64px;">'+this.num+'♠</span>'); break;
+			case 'h':
+				$('#image').html('<span style="color:#ff0000;font-size:64px;">'+this.num+'♥</span>'); break;
+			case 'd':
+				$('#image').html('<span style="color:#0000ff;font-size:64px;">'+this.num+'♦</span>'); break;
+			case 'c':
+				$('#image').html('<span style="color:#00bb00;font-size:64px;">'+this.num+'♣</span>'); break;
+			default:
+				$('#image').html('<span style="color:#000000;font-size:64px;">'+this.num+'</span>'); break;
+		}
+	}
+
+	function drawSentImage(sentImage) {
+		switch (sentImage[1]){
+			case 's':
+				$('#sentImage').html('<span style="color:#000000;font-size:64px;">'+sentImage[0]+'♠</span>'); break;
+			case 'h':
+				$('#sentImage').html('<span style="color:#ff0000;font-size:64px;">'+sentImage[0]+'♥</span>'); break;
+			case 'd':
+				$('#sentImage').html('<span style="color:#0000ff;font-size:64px;">'+sentImage[0]+'♦</span>'); break;
+			case 'c':
+				$('#sentImage').html('<span style="color:#00bb00;font-size:64px;">'+sentImage[0]+'♣</span>'); break;
+			default:
+				$('#sentImage').html('<span style="color:#000000;font-size:64px;">'+sentImage[0]+'</span>'); break;
+		}
+	}
+
+	function keyDown() {
+		var inputString = $('#inputArea').val().toUpperCase() + String.fromCharCode(event.keyCode).toLowerCase();
+		if (easyMode == true) { // 簡易入力モード
+			var indexOfResult = cardsForEasyMode.indexOf(inputString);
+			if (indexOfResult >= 0) { // Hit!
+				sendImage(cards[indexOfResult]);
+				setTimeout(function(){ $('#inputArea').val(''); }, 100);
+				return;
+			}
+			if (inputString == 'g') {
+				sound();
+				setTimeout(function(){ $('#inputArea').val(''); }, 100);
+				return;
+			}
+		} else {
+			if (cards.indexOf(inputString) >= 0) { // Hit!
+				sendImage(inputString);
+				setTimeout(function(){ $('#inputArea').val(''); }, 100);
+			}
+		}
+	}
+	function sound(){
+		var str = "";
+		str = str + "<EMBED id = 'id_sound'";
+		str = str + " SRC=cursor6.wav";
+		str = str + " AUTOSTART='true'";
+		str = str + " HIDDEN='true'>";
+		document.getElementById("id_sound").innerHTML = str;
+	}
+
+	$(function(){
+		drawImage()
+		/*
+		$.ajax({
+			type: 'GET',
+			url: 'http://157.7.200.224:3000',
+			dataType: 'jsonp',
+			jsonpCallback: 'poker',
+			success: function(json){
+				console.log(json);
+				var len = json.length;
+				for(var i=0; i < len; i++){
+					$("#b").append(json[i].version + ' ' + json[i].codename + '<br>');
+				}
+			}
+		});
+		*/
+	});
+
+	var cards = [
+		'As', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', 'Ts', 'Js', 'Qs', 'Ks',
+		'Ah', '2h', '3h', '4h', '5h', '6h', '7h', '8h', '9h', 'Th', 'Jh', 'Qh', 'Kh',
+		'Ad', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', 'Td', 'Jd', 'Qd', 'Kd',
+		'Ac', '2c', '3c', '4c', '5c', '6c', '7c', '8c', '9c', 'Tc', 'Jc', 'Qc', 'Kc'
+	];
+	var cardsForEasyMode = [
+		'Ta', '2a', '3a', '4a', '5a', '6a', '7a', '8a', '9a', 'Qa', 'Wa', 'Ea', 'Ra',
+		'Ts', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', 'Qs', 'Ws', 'Es', 'Rs',
+		'Td', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', 'Qd', 'Wd', 'Ed', 'Rd',
+		'Tf', '2f', '3f', '4f', '5f', '6f', '7f', '8f', '9f', 'Qf', 'Wf', 'Ef', 'Rf'
+	];
+
+</script>
