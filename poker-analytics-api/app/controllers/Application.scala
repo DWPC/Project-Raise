@@ -15,7 +15,9 @@ object Application extends Controller {
 
     val jsBody = request.body.asJson
     System.out.println(jsBody)
-    jsBody.map { json =>
+    jsBody.map { jsonOrigin =>
+      // win版curlからだと"がエスケープされてる場合があるので消去
+      val json = Json.parse(Json.stringify(jsonOrigin).replaceAll("""(^\"|\\|\"$)""",""))
       val players = (json \ "players").as[List[JsValue]].map { player =>
         new Player(
           (player \ "id").as[Int],
